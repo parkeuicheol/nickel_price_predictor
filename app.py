@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from PIL import Image
 import os
 import psutil
+import datetime
 
 # ── 페이지 설정 및 헤더 이미지 ─────────────────────────────────────
 st.set_page_config(page_title="LME Nickel Price Predictor", layout="wide")
@@ -30,8 +31,7 @@ with st.sidebar:
     st.header("입력 설정 / 기준 날짜와 예측 기간을 셋팅하고 RUN버튼을 클릭하면 예측결과가 출력됩니다.")
     date_str = st.date_input(
         "기준 날짜를 선택하세요. 원본 데이터셋에 선택하고자하는 날짜가 없으면 Error가 발생합니다!!!",
-        value=pd.to_datetime("2025-01-31")
-    ).strftime('%Y-%m-%d')
+        value=datetime.date.today()).strftime('%Y-%m-%d')
     shift_set = st.radio(
         "예측 기간(일)을 선택하세요",
         [30, 60, 90],
