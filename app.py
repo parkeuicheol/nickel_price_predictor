@@ -4,11 +4,13 @@ import numpy as np
 import xgboost as xgb
 import matplotlib.pyplot as plt
 from PIL import Image
+import os
+import psutil
 
 # ── 페이지 설정 및 헤더 이미지 ─────────────────────────────────────
 st.set_page_config(page_title="LME Nickel Price Predictor", layout="wide")
 img = Image.open("history_kv.png")
-st.image(img, use_container_width=True)
+st.image(img, use_column_width=True)
 st.title("LME Nickel Price Predicting App")
 
 # Google 스프레드시트 정보
@@ -36,6 +38,14 @@ with st.sidebar:
         format_func=lambda x: f"+{x}일({x//30}달)"
     )
     run = st.button("RUN")
+
+# 메모리 사용량 표시 함수
+@st.cache_data
+
+def get_memory_usage_mb():
+    process = psutil.Process(os.getpid())
+    mem = process.memory_info().rss / (1024 ** 2)
+    return mem
 
 # ── 캐시: 스프레드시트 로드 및 전처리 ─────────────────────────────────
 @st.cache_data(ttl=3600)
@@ -119,6 +129,10 @@ if run:
     bst, X_val, y_val, X_test = train_pipeline(
         SPREADSHEET_ID, SHEET_NAME, date_str, shift_set
     )
+    # 메모리 사용량 표시
+    mem_mb = get_memory_usage_mb()
+    st.sidebar.write(f"🧠 Memory usage: {mem_mb:.1f} MB")
+
     # 검증 지표
     dval = xgb.DMatrix(X_val)
     y_pred = bst.predict(dval)
