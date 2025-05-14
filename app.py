@@ -30,7 +30,7 @@ st.markdown(
 with st.sidebar:
     st.header("입력 설정 / 기준 날짜와 예측 기간을 셋팅하고 RUN버튼을 클릭하면 예측결과가 출력됩니다.")
     date_str = st.date_input(
-        "기준 날짜를 선택하세요. 원본 데이터셋에 선택하고자하는 날짜가 없으면 Error가 발생합니다!!!",
+        "기준 날짜를 선택하세요. 원본 데이터셋에 없는 날짜를 선택하여 RUN하면 Error가 발생합니다!!!",
         value=datetime.date.today()).strftime('%Y-%m-%d')
     shift_set = st.radio(
         "예측 기간(일)을 선택하세요",
