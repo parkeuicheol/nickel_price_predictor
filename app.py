@@ -29,7 +29,7 @@ st.markdown(
 with st.sidebar:
     st.header("입력 설정")
     date_str = st.date_input(
-        "기준 날짜를 선택하세요",
+        "기준 날짜를 선택하세요. 원본 데이터셋에 선택하고자하는 날짜가 없으면 Error가 발생합니다!!!",
         value=pd.to_datetime("2025-01-31")
     ).strftime('%Y-%m-%d')
     shift_set = st.radio(
