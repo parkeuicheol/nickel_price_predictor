@@ -27,7 +27,7 @@ st.markdown(
 
 # ── 사이드바: 기준 날짜 & 예측 기간 ─────────────────────────────────
 with st.sidebar:
-    st.header("입력 설정")
+    st.header("입력 설정 / 기준 날짜와 예측 기간을 셋팅하고 RUN버튼을 클릭하면 예측결과가 출력됩니다.")
     date_str = st.date_input(
         "기준 날짜를 선택하세요. 원본 데이터셋에 선택하고자하는 날짜가 없으면 Error가 발생합니다!!!",
         value=pd.to_datetime("2025-01-31")
