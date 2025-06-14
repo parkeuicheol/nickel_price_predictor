@@ -8,15 +8,23 @@ import os
 import psutil
 import datetime
 
+
+# ── 한글 폰트 설정 (여기에 추가) ────────────────────────────────────
+# Windows 에서는 'Malgun Gothic', Linux(Ubuntu)에서는 'NanumGothic' 등을 설치해서 사용
+plt.rcParams['font.family'] = 'Malgun Gothic'       # Windows
+# plt.rcParams['font.family'] = 'NanumGothic'      # Ubuntu 등
+plt.rcParams['axes.unicode_minus'] = False         # 마이너스 기호 깨짐 방지
+
+
 # ── 페이지 설정 및 헤더 이미지 ─────────────────────────────────────
 st.set_page_config(page_title="LME Nickel Price Predictor", layout="wide")
 img = Image.open("history_kv.png")
-st.image(img, use_container_width=True)
+st.image(img, use_column_width=True)
 st.title("LME Nickel Price Predicting App")
 
 # Google 스프레드시트 정보
 SPREADSHEET_ID  = "1TuDjoOtuZHP7xe3WplvIqwIJXTpJVY0k6JHo6ZQktc8"
-SHEET_NAME      = "Sheet1"
+SHEET_NAME      = "Sheet2"
 SPREADSHEET_URL = (
     f"https://docs.google.com/spreadsheets/d/{SPREADSHEET_ID}"
     "/edit?usp=sharing"
@@ -187,12 +195,54 @@ if run:
     )
 
     st.subheader("Predicted Ni Price Chart")
+
+    # 1) 세그먼트 수 및 평균 계산
+    n_segments = shift_set // 30
+    seg_means = [
+        X_test['predicted_Ni_price'].iloc[i*30:(i+1)*30].mean()
+        for i in range(n_segments)
+    ]
+    # overall_mean = X_test['predicted_Ni_price'].mean() if n_segments > 1 else None
+
+    # 2) 플롯
     fig, ax = plt.subplots()
-    ax.plot(X_test.index, X_test['predicted_Ni_price'], label='Predicted Ni Price')
-    ax.plot(X_test.index, X_test['SMA_7'], linestyle='--', label='7-Day SMA')
-    ax.set_title('Predicted Ni Price & 7-Day SMA')
+    ax.plot(X_test.index, X_test['predicted_Ni_price'], label='Daily Predicted Line')
+    ax.plot(X_test.index, X_test['SMA_7'], linestyle='--', label='Trend Line')
+    ax.set_title('Daily Predicted LME Nickel 선물 Price & Trend Line')
     ax.set_xlabel('Date')
-    ax.set_ylabel('Ni Price')
-    ax.legend()
+    ax.set_ylabel('Price(USD)')
+    # 변경
+    ax.legend(
+        loc='lower right',        # axes 좌표계 기준 우측 하단
+        frameon=True,             # 테두리 보이기
+        borderaxespad=0.5,        # axes 가장자리와 범례 상자 간격
+        )
+
+    # 3) 위쪽 여백 확보 (전체 평균까지 들어갈 공간)
+    fig.subplots_adjust(top=0.8)
+
+    # 4) 세그먼트별 평균 텍스트 (y=0.95, x는 균등 분할)
+    x_positions = np.linspace(0.15, 0.85, n_segments)
+    for i, mean_val in enumerate(seg_means):
+        ax.text(
+            x_positions[i], 0.85,
+            f"{30*i+1}–{30*(i+1)}일 평균:\nUSD {mean_val:.2f}",
+            transform=ax.transAxes,
+            ha='center', va='top',
+            clip_on=False,
+            bbox=dict(boxstyle="round,pad=0.3", alpha=0.3)
+        )
+
+    # 5) 전체 평균 텍스트 (y=0.85 중앙)
+    #if overall_mean is not None:
+    #    ax.text(
+    #        0.5, 0.85,
+    #        f"전체 1–{shift_set}일 평균:\nUSD {overall_mean:.2f}",
+    #        transform=ax.transAxes,
+    #        ha='center', va='top',
+    #        clip_on=False,
+    #        bbox=dict(boxstyle="round,pad=0.3", alpha=0.3)
+    #    )
+
     fig.autofmt_xdate()
     st.pyplot(fig)
