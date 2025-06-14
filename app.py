@@ -19,7 +19,7 @@ plt.rcParams['axes.unicode_minus'] = False         # 마이너스 기호 깨짐 
 # ── 페이지 설정 및 헤더 이미지 ─────────────────────────────────────
 st.set_page_config(page_title="LME Nickel Price Predictor", layout="wide")
 img = Image.open("history_kv.png")
-st.image(img, use_column_width=True)
+st.image(img, use_container_width=True)
 st.title("LME Nickel Price Predicting App")
 
 # Google 스프레드시트 정보
